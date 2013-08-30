@@ -1,0 +1,24 @@
+MaterialDef Card {
+
+    MaterialParameters {
+        Texture2D ColorMap
+        Texture2D ColorMap2
+        Color Color (Color)
+        Boolean MixGlow
+    }
+
+    Technique {
+        VertexShader GLSL100:   MatDefs/ColoredTextured.vert
+        FragmentShader GLSL100: MatDefs/SimpleCard.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            Time
+        }
+
+        Defines {
+            GLOW : MixGlow
+        }
+    }
+
+}

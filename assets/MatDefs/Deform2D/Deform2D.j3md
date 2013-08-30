@@ -1,0 +1,35 @@
+MaterialDef Colored Textured {
+
+    MaterialParameters {
+        Texture2D ColorMap
+        Color Color (Color)
+        Vector2 ScaleXY
+        Vector2 ScrollXY
+        Vector2 SkewXY
+        Float ScaleTime
+        Boolean MixBlob
+        Boolean MixColAlpha
+    }
+
+    Technique {
+        VertexShader GLSL100:   MatDefs/Deform2D/Deform2D.vert
+        FragmentShader GLSL100: MatDefs/Deform2D/Deform2D.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            Time
+        }
+        Defines {
+            DEF_SCROLL_XY: ScrollXY
+            DEF_SKEW_XY: SkewXY
+            MIX_COL_ALPHA: MixColAlpha
+            MIX_BLOB : MixBlob
+            SET_SCALE_XY : ScaleXY
+            SET_SCALE_TIME: ScaleTime
+        }
+    }
+
+    Technique {
+    }
+
+}
