@@ -1,11 +1,10 @@
 package magiccard.stage;
 
-import sg.atom.core.GameGUIManager;
-import sg.atom.core.StageManager;
 import sg.atom.stage.SelectManager;
+import sg.atom.stage.StageManager;
 import sg.atom.stage.WorldManager;
 import sg.atom.stage.select.SelectFunction;
-import magiccard.gameplay.*;
+import sg.atom.ui.GameGUIManager;
 
 /**
  *

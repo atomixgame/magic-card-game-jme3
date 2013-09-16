@@ -19,10 +19,11 @@ public class CardLibrary {
     List cards = []
     List cardPics = []
     def cardPicDir = "Textures/Cards/";
-    Random RND = new Random();
     def cardDefDir = "../References/Yugi/AllCardPacks/"
     def appDir = ""
+    Random RND = new Random();
     Map decks=[:]
+    
     public CardLibrary(){
         
     }
@@ -38,28 +39,6 @@ public class CardLibrary {
         println it.name
         }
          */ 
-        loadAllCards()
-        
-    }
-    public void loadAllDecks(){
-        int cardCount = 0;
-        int deckCount = 0;
-        appDir = CardGame.getProjectPath();
-        println(appDir);
-        // From the all pack dir
-        new File(cardDefDir).eachFile{aFile->
-           
-            if (aFile.isDirectory()){
-                if (deckCount>0&&deckCount<10){
-                    decks[aFile.name]=aFile.name
-                    println "Load "+aFile.name
-                }
-                deckCount++;
-            }
-        }
-        println "Total " + deckCount +"decks!"
-    }
-    public void loadAllCards(){
         int cardCount = 0;
         int deckCount = 0;
         appDir = CardGame.getProjectPath();
@@ -105,6 +84,7 @@ public class CardLibrary {
         println "Total " + cardCount +"cards!"
         numOfCards = cardCount;
         // load all the .txt files
+        
     }
     //GroovyScriptEngine gse = new GroovyScriptEngine([cardDefDir]);
     public def getDeckPackFromScript(String name){
@@ -258,6 +238,8 @@ long longlong longlong longlong long text
             return rcards
         }
     }
+    
+    /* Generate cards */
 }
 
 

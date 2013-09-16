@@ -9,8 +9,9 @@ import com.jme3.scene.Geometry
 import com.jme3.scene.Spatial
 import com.jme3.scene.shape.Box
 import com.jme3.scene.shape.Quad
+import java.security.CodeSource
 import sg.atom.gameplay.GameLevel
-import sg.atom.stage.GamePlayManager
+import sg.atom.gameplay.GamePlayManager
 import sg.atom.stage.WorldManager
 
 import com.jme3.material.RenderState
@@ -24,6 +25,16 @@ import sg.atom.fx.particle.ExplosionNodeControl
 import com.jme3.light.PointLight
 import com.jme3.effect.ParticleEmitter
 
+/**
+ *
+ * @author cuong.nguyenmanh2
+ */
+
+/*
+ * CardTable represent the GameLevel. It helps
+ * 
+ * Load, Create, Arrange (positions),Animate the CardSpatial and its Character's model
+ */
 class CardTable extends GameLevel{
 
     private Spatial cardOrg;
@@ -47,36 +58,7 @@ class CardTable extends GameLevel{
         super(gameplay,world,name,path)
         assetManager = world.assetManager
     }
-    
-
-    Quaternion getCardRot(boolean faceUp){
-        if (faceUp){
-            return faceUpQuat.clone()
-        } else {
-            return faceDownQuat.clone()
-        }
-    }
-    
-     /*
-     * Load level, override the method in GameLevel class
-     */
-    public void loadLevel(){
-        super.loadLevel()
-        createCardOrg();
-        createCardBoard();
-        createEffects();
-    }
-        
-     /*
-     * Short for new Vector3f
-     */
-    Vector3f vec3(float x,float y,float z){
-        return new Vector3f(x,y,z);
-    }
-    
-     /*
-     * Create the Card board model
-     */
+    /* Load */
     public void createCardBoard() {
         //levelNode = new Node("LevelNode");
 
@@ -92,10 +74,15 @@ class CardTable extends GameLevel{
         cardBoard.setQueueBucket(RenderQueue.Bucket.Transparent);
         
         levelNode.attachChild(cardBoard);
+        
+        // Color makers
+        createSphere(0.1f,ColorRGBA.Red,center);
+        //createSphere(0.1f,ColorRGBA.Blue,vec3(3,5,-5));
+        //createSphere(0.1f,ColorRGBA.Yellow,vec3(-2,5,-5));
+        
+        createCardOrg();
+
     }
-    /*
-     * For debuging positions
-     */
     public void createSphere(float size,ColorRGBA color,Vector3f pos){
         Sphere sh=new Sphere(8,8,size)
         Geometry sGeo = new Geometry("S",sh)
@@ -105,13 +92,40 @@ class CardTable extends GameLevel{
         sGeo.localTranslation = pos
         levelNode.attachChild(sGeo)
     }
-    /*
-     * Create the orginal Card model
-     */
     public void createCardOrg(){
         cardOrg = ((Node) ((Node) assetManager.loadModel("Models/Cards/Template/card1.j3o")).getChild("Card")).getChild("Cube1");
     }
+    public void loadCharacters(){
+        
+        Quaternion rot= new Quaternion().fromAngleAxis(FastMath.HALF_PI,Vector3f.UNIT_X)
+        /*
+        Spatial demon = assetManager.loadModel("Models/Demons/BlueEyeWhiteDragon/BlueEyes.j3o");
+        demon.scale(0.04f);
+        demon.setLocalRotation(rot);
+        levelNode.attachChild(demon);
+         */
+        Spatial witch = assetManager.loadModel("Models/Demons/Magicians/White/WhiteFemaleMagician.j3o");
+        witch.scale(0.5f);
+        witch.setLocalTranslation(new Vector3f(3f,4f,-5f));
+        witch.setLocalRotation(rot);
+        levelNode.attachChild(witch);
+        
+        Spatial samurai = assetManager.loadModel("Models/Demons/Warior/SamuraiWarior.j3o");
+        samurai.setLocalTranslation(new Vector3f(6f,4f,-5f));
+        samurai.scale(0.5f);
+        samurai.setLocalRotation(rot);
+        levelNode.attachChild(samurai);
+        
+        /** A white, spot light source. */ 
+        PointLight lamp = new PointLight();
+        lamp.setPosition(getCamPos());
+        lamp.setColor(ColorRGBA.White);
+        levelNode.addLight(lamp); 
+    }
+    Node explosionPrefab;
     
+    
+   /* Create */
     public void createDeck(CardPlayer player) {     
         // create Cards for player
         
@@ -129,7 +143,101 @@ class CardTable extends GameLevel{
         }
         arrangeHand(player)
     }
+    void createEffects(){
+        ParticleFactory pf = new ParticleFactory(assetManager);
+        /*
+        ParticleEmitter flame = pf.createFlame();
+        flame.setLocalTranslation(new Vector3f(6f,4f,-5f));
+        
+        ParticleEmitter rain = pf.createRain("");
+        rain.setLocalTranslation(new Vector3f(0,0,-5f));
+        
+        ParticleEmitter spark = pf.createSpark();
+        spark.setLocalTranslation(new Vector3f(0,0,-5f));
+         */
+        explosionPrefab = pf.createExplosionNode();
+        explosionPrefab.getControl(ExplosionNodeControl.class).setMaxTime(2f)
+    }
+    void addExplosion(Vector3f pos){
+        def explosion = explosionPrefab.clone();
+        explosion.localTranslation =pos.clone();
+        /*
+        levelNode.attachChild(flame);
+        levelNode.attachChild(rain);
+        levelNode.attachChild(spark);
+         */
+        levelNode.attachChild(explosion);
+    }
+    void destroy(CardPlayer player,Card card){
+        addExplosion(card.spatial.localTranslation)
+        CardSpatialControl cc=getCardControl(card.spatial)
+        cc.gigle = true;
+        actions<<[
+            time:1f,
+            do:{
+                card.spatial.removeFromParent()
+            }
+        ]
+    }
     
+    public void loadLevel(){
+        super.loadLevel()
+        createCardBoard()
+        createEffects();
+        //loadDemons();
+        //loadCharacters();
+    }
+    /*
+    public void constructTable(Node levelNode){
+    Box cardShape = new Box(2,0.05,6)
+        
+    (-1..1).each{ side ->
+    (1..2).each{ row ->
+    (1..5).each{ cardIndex ->
+    Geometry cardHolderGeo = new Geometry("Card ",cardShape)
+                    
+    x = (float)cardIndex
+    z = (float)(side * 5 + row * 2.5)
+    y =0f;
+                    
+    cardHolderGeo.localTranslate = vec3(x,y,z)
+    levelNode.attachChild(cardHolderGeo);
+    }
+    }
+    }
+    }
+     */
+
+ /* Routines */   
+    public void simpleUpdate(float tpf){
+        // see if anything queued
+        for (Iterator it=actions.iterator(); it.hasNext(); ) {
+            def action = it.next();
+            if ((action.time -= tpf) <0) {
+                action.do()
+                it.remove();
+            } else {
+                // do nothing but wait
+            }
+        }
+    }   
+    /* Utils */
+    public Vector3f getCamPos(){
+        return center.add(0f,-8f,20f)
+    }
+    Quaternion getCardRot(boolean faceUp){
+        if (faceUp){
+            return faceUpQuat.clone()
+        } else {
+            return faceDownQuat.clone()
+        }
+    }
+
+    Vector3f vec3(float x,float y,float z){
+        return new Vector3f(x,y,z);
+    }
+    
+    /* Arrange and Pos */
     public void arrangeDeck(CardPlayer player){
         int numOfCards = player.currentDeck.cardList.size()
                     
@@ -173,7 +281,7 @@ class CardTable extends GameLevel{
             
             Quaternion rotPIY =new Quaternion().fromAngleAxis(FastMath.PI,Vector3f.UNIT_Y);
             Quaternion rotPIZ =new Quaternion().fromAngleAxis(FastMath.PI,Vector3f.UNIT_Z);
-            Quaternion rotXYZ =getCardRot(faceUp || gamePlayManager.debugMode)
+            Quaternion rotXYZ =getCardRot(faceUp)
             //newCard.setLocalRotation(rotXYZ)
 
             Vector3f cardPos = gap.mult(vec3((float)i,1f,(float)i));
@@ -181,7 +289,6 @@ class CardTable extends GameLevel{
             //newCard.setLocalTranslation(handPos.add(cardPos));
             CardSpatialControl cc=getCardControl(card.spatial)
             cc.pos(handPos.add(cardPos))
-            
             cc.rot(rotXYZ)
 
         }
@@ -302,90 +409,22 @@ class CardTable extends GameLevel{
         cc.pos(nextCardPos)
 
     }
-    public Vector3f getCamPos(){
-        return center.add(0f,-8f,20f)
-    }
-    void addExplosion(Vector3f pos){
-        def explosion = explosionPrefab.clone();
-        explosion.localTranslation =pos.clone();
-        /*
-        levelNode.attachChild(flame);
-        levelNode.attachChild(rain);
-        levelNode.attachChild(spark);
-         */
-        levelNode.attachChild(explosion);
-    }
-    void destroy(CardPlayer player,Card card){
-        addExplosion(card.spatial.localTranslation)
-        CardSpatialControl cc=getCardControl(card.spatial)
-        cc.gigle = true;
-        actions<<[
-            time:1f,
-            do:{
-                card.spatial.removeFromParent()
-            }
-        ]
-    }
-
-    public void simpleUpdate(float tpf){
-        // see if anything queued
-        for (Iterator it=actions.iterator(); it.hasNext(); ) {
-            def action = it.next();
-            if ((action.time -= tpf) <0) {
-                action.do()
-                it.remove();
-            } else {
-                // do nothing but wait
-            }
-        }
+    void putDownTable(pos,up){
+        
     }
     
-
-    Node explosionPrefab;
-    void createEffects(){
-        ParticleFactory pf = new ParticleFactory(assetManager);
-        /*
-        ParticleEmitter flame = pf.createFlame();
-        flame.setLocalTranslation(new Vector3f(6f,4f,-5f));
+    void flip(){
         
-        ParticleEmitter rain = pf.createRain("");
-        rain.setLocalTranslation(new Vector3f(0,0,-5f));
-        
-        ParticleEmitter spark = pf.createSpark();
-        spark.setLocalTranslation(new Vector3f(0,0,-5f));
-         */
-        explosionPrefab = pf.createExplosionNode();
-        explosionPrefab.getControl(ExplosionNodeControl.class).setMaxTime(2f)
     }
-    public void loadCharacters(){
+    void attack(){
         
-        Quaternion rot= new Quaternion().fromAngleAxis(FastMath.HALF_PI,Vector3f.UNIT_X)
-        /*
-        Spatial demon = assetManager.loadModel("Models/Demons/BlueEyeWhiteDragon/BlueEyes.j3o");
-        demon.scale(0.04f);
-        demon.setLocalRotation(rot);
-        levelNode.attachChild(demon);
-         */
-        Spatial witch = assetManager.loadModel("Models/Demons/Magicians/White/WhiteFemaleMagician.j3o");
-        witch.scale(0.5f);
-        witch.setLocalTranslation(new Vector3f(3f,4f,-5f));
-        witch.setLocalRotation(rot);
-        levelNode.attachChild(witch);
+    }
+    void deffend(){
         
-        Spatial samurai = assetManager.loadModel("Models/Demons/Warior/SamuraiWarior.j3o");
-        samurai.setLocalTranslation(new Vector3f(6f,4f,-5f));
-        samurai.scale(0.5f);
-        samurai.setLocalRotation(rot);
-        levelNode.attachChild(samurai);
+    }
+    void shuttleDeck(){
         
-        /** A white, spot light source. */ 
-        PointLight lamp = new PointLight();
-        lamp.setPosition(getCamPos());
-        lamp.setColor(ColorRGBA.White);
-        levelNode.addLight(lamp); 
     }
 
-    
-    
 }
 

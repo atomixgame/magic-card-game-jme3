@@ -12,9 +12,78 @@ import sg.atom.entity.SpatialEntity
  * @author cuong.nguyenmanh2
  */
 public class Card  extends SpatialEntity{
+    
+    /* Constants */
+    
     public enum CardType {Magic,Monster,Trap}
     public enum CardRaces {Demon,Human,Beast,Ghost}
     public enum CardElementType {Ice,Fire,Earth,Air,Ocean,Tree}
+    
+    
+    /*
+Attributes	
+
+    DARK
+    DIVINE
+    EARTH
+    FIRE
+    LAUGH
+    LIGHT
+    WATER
+    WIND 
+
+Types	
+
+    Aqua
+    Beast
+    Beast-Warrior
+    Charisma†
+    Creator God
+    Dinosaur
+    Divine-Beast
+    Dragon
+    Fairy
+    Fiend
+    Fish
+    Insect
+    Machine
+    Plant
+    Psychic
+    Pyro
+    Reptile
+    Rock
+    Sea Serpent
+    Spellcaster
+    Thunder
+    Warrior
+    Winged Beast
+    Zombie
+    Archetype
+    Human
+    Immortal
+    ?
+    ???
+    Black Magic
+    White Magic
+    Illusion Magic
+    Series 
+
+Secondary types	
+
+    Toon
+    Spirit
+    Union
+    Gemini
+    Tuner
+    Dark Tuner
+    Armor
+    Plus
+    Minus
+    Plus Minus
+
+
+    */
+    
     String cardId=""
     String name = ""
     String picture = ""
@@ -36,6 +105,7 @@ public class Card  extends SpatialEntity{
     String effectScript=""
     String rarity=""
     Card orgCard
+    def effected = []
     
     public Card(String name){
         super(name,name)
@@ -70,24 +140,5 @@ public class Card  extends SpatialEntity{
         str +="["+cardId+"] "+this.longDesc+"\n";
         return str;
     } 
-    
-    public String toString(){
-        String str="";
-        str =str + "Name : "+this.name+"\n"
-        str =str +" picture : "+this.picture +"\n"
-        str =str +" attack : "+this.attack+"\n"
-        str =str +" defend : "+this.defend+"\n"
-        str =str +" cardType : "+this.cardType+"\n"
-        //this.cardElementType = orgCard.cardElementType
-        str =str +" level : "+this.level+"\n"
-        
-    }
-    
-    public boolean isMonsterCard(){
-        return cardType.toLowerCase().endsWith("monster");
-    }
-    public boolean isTrapCard(){
-        return cardType.toLowerCase().endsWith("trap");
-    }
 }
 

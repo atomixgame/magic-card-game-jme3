@@ -2,10 +2,9 @@ package magiccard.stage;
 
 import com.jme3.input.event.MouseButtonEvent;
 import com.jme3.input.event.MouseMotionEvent;
-import magiccard.ui.UIInGame;
 import magiccard.gameplay.Card;
-import magiccard.gameplay.CardGamePlay;
-import sg.atom.core.GameGUIManager;
+import magiccard.ui.UIInGame;
+import sg.atom.ui.GameGUIManager;
 import sg.atom.entity.Entity;
 import sg.atom.stage.SelectManager;
 import sg.atom.stage.select.function.SingleSelectFunction;
@@ -34,17 +33,22 @@ public class CardSelectFunction extends SingleSelectFunction {
     @Override
     protected void doSelectSingleEntity(Entity entity) {
         //super.doSelectSingleEntity(entity);
-        Card card = (Card) entity;
-        // display entity info
-        displayEntityInfo(card);
-        
-    }
 
-    void displayEntityInfo(Card card) {
         // display the info to the screen
         GameGUIManager gameGUIManager = selectManager.getGameGUIManager();
+        Card card = (Card) entity;
+        // display entity info
         UIInGame info = (UIInGame) gameGUIManager.getNifty().getCurrentScreen().getScreenController();
         info.setCardInfoText(card.getFullDesc());
+
         info.setCardPicture(card.getPicture());
+        //System.out.println(" Select card !");
+        /*
+        CardSelectControl csc = card.getSpatial().getControl(CardSelectControl.class);
+        if (csc.isHovered()) {
+            csc.doOutHovered();
+        }
+        csc.setHoverable(false);
+        */
     }
 }

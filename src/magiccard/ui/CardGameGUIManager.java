@@ -10,13 +10,10 @@ import com.jme3.math.Vector2f;
 import com.jme3.renderer.ViewPort;
 import com.jme3.ui.Picture;
 import de.lessvoid.nifty.screen.Screen;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import magiccard.CardGame;
 import magiccard.CardGameStageManager;
 import sg.atom.core.AtomMain;
-import sg.atom.core.GameGUIManager;
-import sg.atom.core.StageManager;
+import sg.atom.ui.GameGUIManager;
 import sg.atom.ui.common.UILoadingScreenController;
 
 /**

@@ -1,19 +1,17 @@
 package magiccard.gameplay
 
-import sg.atom.stage.GamePlayManager
-import magiccard.CardGameStageManager
-import magiccard.CardGame
-import sg.atom.gameplay.GameLevel
 import java.util.Random
+import sg.atom.gameplay.GamePlayManager
+import sg.atom.gameplay.GameLevel
 import sg.atom.gameplay.player.Player
 import sg.atom.stage.select.EntitySelectCondition
 import sg.atom.entity.SpatialEntity
+import magiccard.CardGameStageManager
+import magiccard.CardGame
 import magiccard.gameplay.Card
 import magiccard.stage.ClosureSelectCondition
 import magiccard.stage.CardSelectControl
-import magiccard.gameplay.TurnPhase.TurnPhaseType
 import static magiccard.gameplay.TurnPhase.TurnPhaseType.*
-import magiccard.gameplay.ai.*
 
 //import java.util.Collections
 /**
@@ -21,19 +19,23 @@ import magiccard.gameplay.ai.*
  * @author cuong.nguyenmanh2
  */
 public class CardGamePlay extends GamePlayManager {
+    // Story mode
+    Campaign camp
+    // League
+    Tournament tour
+    boolean onTour = false
     CardMatch match
     // The real human player who controlling
     CardPlayer currentPlayer
     CardPlayer opponent
     def uiInGame
     def inGameScreen  
-    boolean tour = false
+
     // Rule
     public Map cardSelectRules=[:];
     public Map userActions=[:]
     String currentSelectRule;
     // Handle turns
-    TurnPhaseType playerChangePhase
     Turn currentTurn;
     boolean initDuel = true;
     int turnCount = 0;
@@ -42,12 +44,16 @@ public class CardGamePlay extends GamePlayManager {
     float TIMEMODE_DISABLE = -1
     // Util
     Random rand = new Random();
-    boolean debugMode = true;
-    String cheatCode ="";
+    TurnPhase.TurnPhaseType playerChangePhase
+    
     public CardGamePlay(CardGame app) {
         super(app)
     }
-    
+    /* ROUTINES ===========================================*/
+    /* Config */
+    public void initInputListener(){
+        
+    }
     public void configGamePlay(){
         println "START GAMEPLAY"
         currentPlayer = new CardPlayer(stageManager,"Yugi")
@@ -60,10 +66,10 @@ public class CardGamePlay extends GamePlayManager {
         
         // Setup the opponent : AI
         opponent= makeRandomPlayer("Kaiba")
-        CardPlayerAI ai = new CardPlayerAI(this);
+        CardPlayerAI ai = new CardPlayerAI();
         opponent.setAI(ai);
         ai.setLevel(CardPlayerAI.AILevel.Normal);
-        match.player2 = opponent;
+        match.player2 = opponent
 
     }
     
@@ -73,19 +79,19 @@ public class CardGamePlay extends GamePlayManager {
     public void matchStart(){
         
         // Take out the 2 decks
-        currentPlayer.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20));
-        opponent.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20));
+        currentPlayer.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20))
+        opponent.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20))
         
-        currentPlayer.currentDeck.clone(currentPlayer.orgDeck);
-        opponent.currentDeck.clone(opponent.orgDeck);
+        currentPlayer.currentDeck.clone(currentPlayer.orgDeck)
+        opponent.currentDeck.clone(opponent.orgDeck)
         
         // Shuffle them!
-        currentPlayer.currentDeck.shuffle();
-        opponent.currentDeck.shuffle();
+        currentPlayer.currentDeck.shuffle()
+        opponent.currentDeck.shuffle()
         
-        CardTable table = (CardTable)currentLevel;
-        table.createDeck(currentPlayer);
-        table.createDeck(opponent);
+        CardTable table = (CardTable)currentLevel
+        table.createDeck(currentPlayer)
+        table.createDeck(opponent)
 
         //table.createHand(currentPlayer)
         //table.createHand(opponent)
@@ -101,33 +107,33 @@ public class CardGamePlay extends GamePlayManager {
         showDeckLog(opponent.currentDeck)
          */
         // Rule set
-        createRules();
-        setCardSelectCondition("noneSelect");
+        createRules()
+        setCardSelectCondition("noneSelect")
         // Set the score
-        currentPlayer.score = 8000;
-        opponent.score = 8000;
+        currentPlayer.score = 8000
+        opponent.score = 8000
 
         // Decide who go first
         currentTurn = new Turn(turnCount);
-        //currentTurn.player = flipCoin(currentPlayer,opponent);
-        currentTurn.player = opponent
+        currentTurn.player = flipCoin(currentPlayer,opponent)
+
         currentTurn.currentPhase = new TurnPhase(DrawPhase);
         waitTimes["ToNextPhase"] = 0;
         if (initDuel){
             // UI change
             updateUI(null);
             updateUI{screen,ui->
-                println(currentTurn.player.name + " go first !");
-                uiInGame.alertFlash(currentTurn.player.name + " go first !");
+                println(currentTurn.player.name + " go first !")
+                uiInGame.alertFlash(currentTurn.player.name + " go first !")
                 if (currentTurn.player == currentPlayer){
-                    uiInGame.setTurn("Player1");
+                    uiInGame.setTurn("Player1")
                 } else {
-                    uiInGame.setTurn("Player2");
+                    uiInGame.setTurn("Player2")
                 }
             }
             (1..5).each{
-                fromDeckToHand(currentPlayer);
-                fromDeckToHand(opponent);
+                fromDeckToHand(currentPlayer)
+                fromDeckToHand(opponent)
             }
             initDuel = false;
                 
@@ -141,68 +147,40 @@ public class CardGamePlay extends GamePlayManager {
             // What phase
                 
         case DrawPhase:
-            currentTurn.currentPhase = new TurnPhase(StandbyPhase);
+            currentTurn.currentPhase = new TurnPhase(StandbyPhase)
             break;
         case StandbyPhase:
-            currentTurn.currentPhase = new TurnPhase(MainPhase);
+            currentTurn.currentPhase = new TurnPhase(MainPhase)
             break;
         case MainPhase:
-            currentTurn.currentPhase = new TurnPhase(BattlePhase);
+            currentTurn.currentPhase = new TurnPhase(BattlePhase)
             break;
         case BattlePhase:
-            currentTurn.currentPhase = new TurnPhase(MainPhase2);
+            currentTurn.currentPhase = new TurnPhase(MainPhase2)
             break;
         case MainPhase2:
-            currentTurn.currentPhase = new TurnPhase(EndPhase);
+            currentTurn.currentPhase = new TurnPhase(EndPhase)
             break;
         case EndPhase:
             turnCount++;
-            println ("New Turn")
-            CardPlayer nextPlayer=otherPlayer(currentTurn.player);
             currentTurn = new Turn(turnCount);
-            currentTurn.player = nextPlayer
-            currentTurn.currentPhase  = new TurnPhase(DrawPhase);
-            
-            if (currentTurn.player == currentPlayer){
-                uiInGame.setTurn("Player1");
-            } else {
-                uiInGame.setTurn("Player2");
-            }
-            waitTimes["ToNextPhase"]=TIMEMODE_DISABLE
+            currentTurn.currentPhase  = new TurnPhase(DrawPhase)
             break;
         }
         
         if (uiInGame!=null){
             updateUI{screen,ui->
-                uiInGame.setTurnPhase(currentTurn.currentPhase.type);
-                uiInGame.alertFlash(currentTurn.currentPhase.type.toString());
+                uiInGame.setTurnPhase(currentTurn.currentPhase.type)
+                uiInGame.alertFlash(currentTurn.currentPhase.type.toString())
             }
         }
-        println("CurrentTurnPhase : "+currentTurn.currentPhase.type.toString());
+        println("CurrentTurnPhase :"+currentTurn.currentPhase.type.toString());
         waitTimes["ToNextPhase"] = 1;
         userActions["userCanceledPhase"] = false;
     }
-    
-    public def actionValid(String actionName){
-        
-    }
-    
-    public boolean setPlayerChangePhase(TurnPhaseType newPhase){
-        playerChangePhase = newPhase;
-        // should be change to the phase after
-    }
-    public boolean isPlayerChangePhase(TurnPhaseType currentPhase){
-        return false;
-    }
-    
-    
+    /* Update */   
     public void update(float tpf){
-        /*
-        if (checkEndGame()){
-        notifyEndGame();
-        return ;
-        }
-         */
+ 
         if (waitTimes["ToNextPhase"]==0){
             // Turn flow
             switch(currentTurn.currentPhase.type){
@@ -223,16 +201,49 @@ public class CardGamePlay extends GamePlayManager {
                 nextPhase()
                 break;
             case MainPhase:
-                if (!currentTurn.player.aiPlayer){
-                    if (isPlayerChangePhase(MainPhase)){
-                        nextPhase()
-                    } else {
-                        humanSelectFunction();
-                    }
+                if (isPlayerChangePhase(TurnPhase.TurnPhaseType.MainPhase)){
+                    nextPhase()
                 } else {
-                    println(currentTurn.player.ai);
-                    currentTurn.player.ai.think();
-                    currentTurn.player.ai.act();
+                    // player summon one
+                    setCardSelectCondition("mainPhaseCards")
+                    if (userActions["userCanceledPhase"]){
+                        nextPhase();
+                    } else {
+                        if (!stageManager.selectManager.currentSelection.isEmpty()){
+                            def list = stageManager.selectManager.currentSelection
+                            def card = list.remove(0)
+                        
+                            if (cardSelectRules["inHandCurrent"].isSelected(card)){
+                                switch (card.cardType){
+                                case "NormalMonster":
+                                    if (!currentTurn.currentPhase.monsterSummoned){
+                                        notifyMoveCard(card,"enableHover")
+                                        fromHandToGround(card)
+                                        currentTurn.currentPhase.monsterSummoned = true;
+                                    } else {
+                                        println("You can not summon twice !")
+                                        updateUI{screen,ui->
+                                            uiInGame.alertSmall("You can not summon twice !")
+                                        }
+                                    }
+                                    break;
+                                case "Magic":
+                                    notifyMoveCard(card,"enableHover")
+                                    fromHandToMagic(card)
+                                    break;
+                                case "Trap":
+                                    notifyMoveCard(card,"enableHover")
+                                    fromHandToMagic(card)
+                                    break;    
+                            
+                                }
+                            } else if (cardSelectRules["inGround"].isSelected(card)){
+                                println ("Destroy card")
+                                destroyCard(card)
+                            }
+
+                        }
+                    }
                 }
                 break;
             case BattlePhase:
@@ -244,10 +255,13 @@ public class CardGamePlay extends GamePlayManager {
             case EndPhase:
                 // whose turn
                 waitTimes["ToNextPhase"]=TIMEMODE_DISABLE
-                nextPhase()
+                currentTurn.player = otherPlayer(currentTurn.player)
+                //nextPhase()
                 break;
             }
             // update things
+            
+            
         } else {
             //println("WTime update" + wtime)
             if (waitTimes["ToNextPhase"]==TIMEMODE_DISABLE) {
@@ -262,57 +276,15 @@ public class CardGamePlay extends GamePlayManager {
         updateUI(null);
                 
     }
-
-    public humanSelectFunction(){
-        // player summon one
-        setCardSelectCondition("mainPhaseCards")
-        if (userActions["userCanceledPhase"]){
-            nextPhase();
-        } else {
-            if (!stageManager.selectManager.currentSelection.isEmpty()){
-                def list = stageManager.selectManager.currentSelection
-                def card = list.remove(0)
-                        
-                if (cardSelectRules["inHandCurrent"].isSelected(card)){
-                    switch (card.cardType){
-                    case "NormalMonster":
-                        if (!currentTurn.currentPhase.monsterSummoned){
-                            notifyMoveCard(card,"enableHover")
-                            fromHandToGround(card)
-                            currentTurn.currentPhase.monsterSummoned = true;
-                        } else {
-                            println("You can not summon twice !")
-                            updateUI{screen,ui->
-                                uiInGame.alertSmall("You can not summon twice !")
-                            }
-                        }
-                        break;
-                    case "Magic":
-                        notifyMoveCard(card,"enableHover")
-                        fromHandToMagic(card)
-                        break;
-                    case "Trap":
-                        notifyMoveCard(card,"enableHover")
-                        fromHandToMagic(card)
-                        break;    
-                            
-                    }
-                } else if (cardSelectRules["inGround"].isSelected(card)){
-                    println ("Destroy card")
-                    destroyCard(card)
-                }
-
-            }
+    
+    public void updateGameplay(){
+        /*
+        while (!checkEndGame()){
+        turnCount++;
         }
-    }    
-
-    
-    
-    public void initInputListener(){
-        
+         */
     }
-    
-    
+   
     public void updateUI(def action){
         if (inGameScreen ==null || uiInGame==null){
             // Make sure it will not be NULL in next update
@@ -343,7 +315,20 @@ public class CardGamePlay extends GamePlayManager {
             
         }
     }
-    /* Player Manage Functions */
+    // Utils =====================================================
+    
+    public def actionValid(String actionName){
+        
+    }
+    
+    public boolean setPlayerChangePhase(TurnPhase.TurnPhaseType newPhase){
+        playerChangePhase = newPhase;
+        // should be change to the phase after
+    }
+    public boolean isPlayerChangePhase(TurnPhase.TurnPhaseType currentPhase){
+        return false;
+    }    
+    // Player Manager Functions
     public boolean isCurrentPlayer(player){
         return (currentPlayer == player)
     }  
@@ -355,13 +340,15 @@ public class CardGamePlay extends GamePlayManager {
     }
     public CardPlayer makeRandomPlayer(name){
         
-        def player = new CardPlayer(stageManager,name);
+        def player = new CardPlayer(stageManager,name)
         //player.name = name
         
         // make fake random deck
-        return player;
+        return player
     }
     
+    // Match Function
+
     // Gameplay function
     public boolean checkEndGame(){
         if (match.player1.score<=0||player2.score<=0){
@@ -377,9 +364,9 @@ public class CardGamePlay extends GamePlayManager {
             if (match.player1.currentDeck.cardList.size()<=0 && player2.currentDeck.cardList.size()<=0){
                 match.status = CardMatch.MatchStatus.Draw
             } else if (match.player1.currentDeck.cardList.size()<=0) {
-                match.status = CardMatch.MatchStatus.Lose;
+                match.status = CardMatch.MatchStatus.Lose  
             } else {
-                match.status = CardMatch.MatchStatus.Win;
+                match.status = CardMatch.MatchStatus.Win  
             }
             return true;
         }
@@ -433,7 +420,10 @@ public class CardGamePlay extends GamePlayManager {
         
         table.arrangeHand(player)
     }
-    /* Functions for support: trap and magic cards*/
+    void putDownTable(pos,up){
+        
+    }
+    
     void activeCard(Card starterCard,List targetCards){
         if (starterCard.cardType ==Card.CardType.Magic||starterCard.cardType ==Card.CardType.Trap){
             effect(starterCard,targetCards)
@@ -445,7 +435,16 @@ public class CardGamePlay extends GamePlayManager {
     public void executeScript(String script){
         
     }
-    
+    /* Gameplay mechanics */
+    def detach(){
+        
+    }
+    def discard(){
+        
+    }
+    def banish(){
+        
+    }
     public void flip(Card starterCard){
         // notify to chain
         notifyFlip(starterCard)
@@ -500,11 +499,10 @@ public class CardGamePlay extends GamePlayManager {
         
     }
 
-    /** RULES & SELECT FUNCTIONS */
     void createRules(){
         createSelectConditions();
     }
-    
+    /* Select */
     void createSelectConditions(){
         // RULE :  The card is in hand
         def inHandRule ={card->
@@ -547,6 +545,7 @@ public class CardGamePlay extends GamePlayManager {
             if (player.ground.contains(card)) {
                 return true;
             }
+            
             return false; 
         }
         cardSelectRules["inGround"] =new ClosureSelectCondition(inGroundRule);
@@ -580,7 +579,7 @@ public class CardGamePlay extends GamePlayManager {
             stageManager.selectManager.setEntitySelectCondition(cardSelectRules[currentSelectRule])
         }
     }
-        
+    /* Utils */
     public void showDeckLog(deck){
         deck.cardList.each{
             println it.name

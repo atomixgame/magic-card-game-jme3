@@ -1,9 +1,13 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package magiccard.gameplay
 
 import sg.atom.gameplay.player.Player;
 import magiccard.CardGameStageManager;
 import magiccard.gameplay.rule.CardGameRestriction
-import magiccard.gameplay.ai.*
+
 /**
  *
  * @author cuong.nguyenmanh2
@@ -28,8 +32,8 @@ public class CardPlayer extends Player{
     List ground = []
     List magic = []
     
-    boolean aiPlayer = false
-    CardPlayerAI ai;
+    boolean aIPlayer = false
+    CardPlayerAI aI;
     CardGameRestriction restriction
     
     public CardPlayer(CardGameStageManager stage, String name) {
@@ -38,10 +42,9 @@ public class CardPlayer extends Player{
         currentDeck = new Deck()
     }
     
-    public setAI(CardPlayerAI ai){
-        this.ai= ai;
-        this.ai.player = this;
-        aiPlayer =true;
+    public setAI(CardPlayerAI aI){
+        this.aI= aI;
+        aIPlayer =true;
     }
     
     public Card fromDeckToHand(){
@@ -63,13 +66,13 @@ public class CardPlayer extends Player{
         
         // player select the card
         if (isAIPlayer()){
-            starterCard = ai.askForSelect(type,inCardList,info,condition)
+            starterCard = cardPlayerAI.askForSelect(type,inCardList,info,condition)
         } else {
             starterCard = gamePlay.askForSelect(type,inCardList,info,condition)
         }
         // player select target if need
         if (isAIPlayer()){
-            targetCards = ai.askForSelect(type,inCardList,info,condition)
+            targetCards = cardPlayerAI.askForSelect(type,inCardList,info,condition)
         } else {
             targetCards = gamePlay.askForSelect(type,inCardList,info,condition)
         }

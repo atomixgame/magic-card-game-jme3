@@ -1,7 +1,14 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 package magiccard.gameplay
 
 import com.jme3.scene.control.AbstractControl
 import com.jme3.math.Vector3f
+import com.jme3.renderer.RenderManager
+import com.jme3.renderer.ViewPort
 import com.jme3.math.FastMath;
 import sg.atom.entity.SpatialEntityControl
 import sg.atom.stage.SelectManager
@@ -39,6 +46,9 @@ public class CardSpatialControl extends SpatialEntityControl{
         timeRot = 0;
         stopRot = false;
     } 
+    public void controlRender(RenderManager render, ViewPort viewPort){
+         
+    }       
             
     public void controlUpdate(float tpf){
         updatePos(tpf);

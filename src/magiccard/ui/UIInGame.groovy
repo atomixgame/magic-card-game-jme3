@@ -28,7 +28,6 @@ import magiccard.gameplay.CardLibrary
 import magiccard.gameplay.CardGamePlay
 import magiccard.gameplay.CardMatch
 import magiccard.gameplay.TurnPhase
-import magiccard.gameplay.TurnPhase.TurnPhaseType
 import static magiccard.gameplay.TurnPhase.TurnPhaseType.*
 /**
  *
@@ -53,7 +52,7 @@ public class UIInGame implements ScreenController{
     Element txtAlertSmall;
     Element alertSmallPanel;
     Element dialogUI;
-    TurnPhaseType currentTurnPhase;
+    TurnPhase.TurnPhaseType currentTurnPhase;
     CardGamePlay gameplay;
     
     Element p1TurnText;
@@ -125,7 +124,6 @@ public class UIInGame implements ScreenController{
         if (player.equals("Player1")){
             p1TurnText.getRenderer(TextRenderer.class).text = "Turn"
             p2TurnText.getRenderer(TextRenderer.class).text = ""
-            enableAllButtons();
         } else {
             p1TurnText.getRenderer(TextRenderer.class).text = ""
             p2TurnText.getRenderer(TextRenderer.class).text = "Turn"
@@ -137,15 +135,15 @@ public class UIInGame implements ScreenController{
         cardPicture.getRenderer(ImageRenderer.class).setImage(img);
     }
     
-    public void setTurnPhase(TurnPhaseType nextTurnPhase){
+    public void setTurnPhase(TurnPhase.TurnPhaseType nextTurnPhase){
         if (this.currentTurnPhase!=nextTurnPhase){
-            setButtonFocus(nextTurnPhase);
+            setButtonFocus();
             this.currentTurnPhase = nextTurnPhase;
         }
         //this.screen.resetLayout() 
     }
     
-    void setButtonFocus(TurnPhaseType nextTurnPhase){
+    void setButtonFocus(TurnPhase.TurnPhaseType nextTurnPhase){
         switch(nextTurnPhase){
             // What phase
                 
@@ -209,14 +207,7 @@ public class UIInGame implements ScreenController{
         btnMP2.disable();
         btnEP.disable();
     }
-    void enableAllButtons(){
-        btnDP.enable();
-        btnSP.enable();
-        btnMP.enable();
-        btnBP.enable();
-        btnMP2.enable();
-        btnEP.enable();
-    }
+    
     
     public void alertFlash(String alertMsg){
         txtAlertFlash.getRenderer(TextRenderer.class).setText(alertMsg);
@@ -257,7 +248,7 @@ public class UIInGame implements ScreenController{
     public void endPhase(){
         showDialog()
     }
-    void goToPhase(TurnPhaseType aPhase){
+    void goToPhase(TurnPhase.TurnPhaseType aPhase){
         if (currentTurnPhase.getNext()==aPhase){
             gameplay.setPlayerChangePhase(aPhase)
         } else {

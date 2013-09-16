@@ -6,7 +6,7 @@ import magiccard.gameplay.CardGamePlay;
 import magiccard.gameplay.CardLibrary;
 import magiccard.gameplay.CardTable;
 import magiccard.stage.CardGameSelectManager;
-import sg.atom.core.StageManager;
+import sg.atom.stage.StageManager;
 import sg.atom.stage.WorldManager;
 
 /**

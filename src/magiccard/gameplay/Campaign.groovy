@@ -9,11 +9,20 @@ package magiccard.gameplay
  *
  * @author cuong.nguyenmanh2
  */
-class Tournament {
-    CardPlayer[] players
-    CardMatch[] matches
+class Campaign {
+    def currentStory
     
-    def createMatch(){
+    def loadStories(){
+        
+    }
+    
+    def select(story){
+        
+    }
+    def start(story){
+        
+    }
+    def finish(story){
         
     }
 }

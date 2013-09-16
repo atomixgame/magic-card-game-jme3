@@ -6,9 +6,9 @@
 package magiccard.gameplay
 
 public class Turn{
-    long id=-1;
     CardPlayer player
     TurnPhase currentPhase
+    List<CardAction> actions
     int num;
     public Turn(int num){
         this.num = num;

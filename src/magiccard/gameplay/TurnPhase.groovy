@@ -7,7 +7,7 @@ package magiccard.gameplay
 
 public class TurnPhase{
     
-    public static enum TurnPhaseType {DrawPhase,StandbyPhase,MainPhase,BattlePhase,MainPhase2,EndPhase;
+    public static enum TurnPhaseType {DrawPhase,StandbyPhase,MainPhase,BattlePhase,MainPhase2,EndPhase
         public TurnPhaseType getNext(){
             return values()[(ordinal()+1) % values().length];
         }
@@ -27,8 +27,6 @@ public class TurnPhase{
     
     TurnPhaseType type
     boolean monsterSummoned=false;    
-    List<CardAction> actions;
-    Turn parent;
     
     TurnPhase(TurnPhaseType type){
         this.type = type
