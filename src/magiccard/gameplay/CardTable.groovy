@@ -154,9 +154,10 @@ class CardTable extends GameLevel{
         
         ParticleEmitter spark = pf.createSpark();
         spark.setLocalTranslation(new Vector3f(0,0,-5f));
-         */
+         
         explosionPrefab = pf.createExplosionNode();
         explosionPrefab.getControl(ExplosionNodeControl.class).setMaxTime(2f)
+         */
     }
     void addExplosion(Vector3f pos){
         def explosion = explosionPrefab.clone();

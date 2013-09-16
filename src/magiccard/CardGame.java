@@ -42,11 +42,13 @@ public class CardGame extends AtomMain {
 
     @Override
     public void simpleInitApp() {
+        // FIX: Get the directory for load native assets
         String projectDir = CardGame.getProjectParentPath();
         projectDir = projectDir.replaceAll("/", "//");
         System.out.println(" " + projectDir);
         assetManager.registerLocator(projectDir + "//References//Yugi//AllCardPacks//", FileLocator.class);
 
+        // Default..
         setDisplayStatView(false);
         initGameStateManager();
         startup();
@@ -96,13 +98,14 @@ public class CardGame extends AtomMain {
         return (CardGameStateManager) super.getGameStateManager();
     }
 
+    /* File functions to help the library to load native assets and referenced files */
     public static String getProjectPath() {
-        return getProjectParentPath() + "MagicCards";
+        return getProjectParentPath() + "magic-card-game-jme3";
     }
 
     public static String getProjectParentPath() {
         String buildDir = CardGame.getCurrentJarFilePath();
-        String projectDir = buildDir.substring(1, buildDir.lastIndexOf("MagicCards"));
+        String projectDir = buildDir.substring(1, buildDir.lastIndexOf("magic-card-game-jme3"));
         return projectDir;
     }
 

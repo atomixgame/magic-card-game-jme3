@@ -6,6 +6,9 @@ import magiccard.gameplay.*
  *
  * @author hungcuong
  */
+/* 
+Overal restriction of the Match
+*/
 public class CardGameRestriction {
 
     boolean attackCancel = false;

@@ -33,5 +33,11 @@ class SummonMechanics {
     def fusionSummon(){
         
     }
+    def ritual(){
+        
+    }
+    def synchro(){
+        
+    }
 }
 

@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package magiccard.movement
+package magiccard.gameplay.rule
 
 /**
  *
- * @author hungcuong
+ * @author cuong.nguyenmanh2
  */
-class CircleMove {
+class CardEffectScript {
 	
 }
 

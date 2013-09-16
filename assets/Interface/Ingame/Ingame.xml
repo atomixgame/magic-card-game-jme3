@@ -70,7 +70,7 @@
                             </panel> 
                         </panel> 
                      
-                        <panel id="panel" height="100%" width="20%" align="center" valign="center" childLayout="vertical" visibleToMouse="true">
+                        <panel id="phaseBtnPanel" height="100%" width="20%" align="center" valign="center" childLayout="vertical" visibleToMouse="true">
                             <control id="btnDP" name="button" style="phase-button" label="D&#10;P" height="16%" width="30px"  >
                                 <interact onClick="drawPhase()"/>    
                             </control>
@@ -160,6 +160,22 @@
                             <interact onClick="dialogYes()"/>
                         </control>
                     </panel>  
+                </panel>
+            </panel>
+        </layer>
+        
+<layer height="100%" width="100%" id="emotionLayer" childLayout="center">
+            <panel id="emotionLayout" height="40%" width="70%" align="right" valign="center" childLayout="vertical" padding="10px">
+                <panel id="emotionBand" height="80%" width="60%" align="center" valign="center" childLayout="vertical" padding="10px" backgroundImage="Interface/Images/bg/yugioh-com-004.jpg">
+                    <effect>
+                        <onStartScreen name="move" mode="out" direction="bottom" length="100" startDelay="0" inherit="true" neverStopRendering="true"/>
+                        <onEndScreen  name="fade" start="#ff" end="#00" length="100" startDelay="0"  neverStopRendering="true"/>
+                        <onCustom customKey="moveOut" name="move" mode="out" direction="bottom" length="200" startDelay="0" inherit="true" neverStopRendering="true"/>
+                        <onCustom customKey="moveIn" name="move" mode="in" direction="bottom" length="200" startDelay="0" inherit="true" neverStopRendering="true"/>
+                    </effect>
+                    <text id="emotion_Title" height="25%" style="HFontBig" width="100%" text="Dialog" align="left" valign="center" textAlign="left" />
+                    <text id="emotion_Message" height="25%" style="defaultFont" width="100%" text="Are you sure you want to End your phase ?" align="left" valign="center" textAlign="left" />
+
                 </panel>
             </panel>
         </layer>

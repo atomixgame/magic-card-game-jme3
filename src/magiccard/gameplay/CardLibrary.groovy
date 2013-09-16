@@ -20,6 +20,7 @@ public class CardLibrary {
     List cardPics = []
     def cardPicDir = "Textures/Cards/";
     def cardDefDir = "../References/Yugi/AllCardPacks/"
+    def assetDir = "/../assets/";
     def appDir = ""
     Random RND = new Random();
     Map decks=[:]
@@ -146,8 +147,8 @@ public class CardLibrary {
     }
       
     public void getAllCardPics(){
-        
-        def assetDir = "/../assets/";
+      
+
         File f= new File(getJarPath()+assetDir+cardPicDir);
         //println f.absolutePath;
         

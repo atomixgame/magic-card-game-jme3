@@ -6,6 +6,7 @@ import magiccard.gameplay.CardGamePlay;
 import magiccard.gameplay.CardLibrary;
 import magiccard.gameplay.CardTable;
 import magiccard.stage.CardGameSelectManager;
+import sg.atom.core.AtomMain;
 import sg.atom.stage.StageManager;
 import sg.atom.stage.WorldManager;
 
@@ -28,7 +29,7 @@ public class CardGameStageManager extends StageManager {
         cardLib = new CardLibrary();
         cardLib.init();
         //cardLib.getAllCardPics();
-        this.gamePlayManager = new CardGamePlay(getApp());
+        this.gamePlayManager = new CardGamePlay((CardGame)app);
         table = new CardTable(gamePlayManager, this.getWorldManager(), "Level1", "");
         currentLevel = table;
         worldManager.initWorld(currentLevel);
@@ -84,7 +85,7 @@ public class CardGameStageManager extends StageManager {
 
     @Override
     public CardGame getApp() {
-        return (CardGame) super.getApp();
+        return (CardGame) app;
     }
 
     public void goOutGame() {

@@ -13,7 +13,7 @@ public class CardMatch {
         Win,Lose,Draw,None,End
     }
         
-    MatchStatus status =MatchStatus.None
+    MatchStatus status = MatchStatus.None
     int player1Score = 0
     int player2Score =0
     CardGameRestriction restriction

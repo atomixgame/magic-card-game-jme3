@@ -9,7 +9,7 @@ import com.jme3.material.Material
 import com.jme3.math.ColorRGBA
 import com.jme3.scene.shape.Quad
 import sg.atom.gameplay.GameLevel
-import sg.atom.stage.GamePlayManager
+import sg.atom.gameplay.GamePlayManager
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -29,6 +29,8 @@ import magiccard.gameplay.CardGamePlay
 import magiccard.gameplay.CardMatch
 import magiccard.gameplay.TurnPhase
 import static magiccard.gameplay.TurnPhase.TurnPhaseType.*
+import magiccard.ui.query.GQuery
+import static magiccard.ui.query.GQuery.*;
 /**
  *
  * @author cuong.nguyenmanh2
@@ -57,6 +59,8 @@ public class UIInGame implements ScreenController{
     
     Element p1TurnText;
     Element p2TurnText;
+    
+    Element emotionBand;
     boolean resume = false;
     
     public UIInGame(CardGameGUIManager gameGUIManager) {
@@ -87,14 +91,22 @@ public class UIInGame implements ScreenController{
                 txtAlertSmall  = screen.findElementByName("alertSmall");
                 alertSmallPanel  = screen.findElementByName("alertSmallPanel");
                 dialogUI = screen.findElementByName("dialog");
+                emotionBand = screen.findElementByName("emotionBand");
                 
                 p1TurnText = screen.findElementByName("Player1Turn");
                 p2TurnText = screen.findElementByName("Player2Turn");
+                
+                def $q=GQuery.q(screen)
+                $q.qel("phaseBtnPanel").each{
+                    it.text = it.id
+                }
                 resume=true;
             }
         }
     }
 
+
+    
     public void onStartScreen() {
         if (!screen.getScreenId().equals("PauseScreen")){
             player1Score.getRenderer(TextRenderer.class).text = "1000";
@@ -107,6 +119,7 @@ public class UIInGame implements ScreenController{
     public void onEndScreen() {
     }
     
+    /* Setter & Getters */
     public void setScores(int score1,int score2){
         player1Score.getRenderer(TextRenderer.class).text = ""+score1;
         player2Score.getRenderer(TextRenderer.class).text = ""+score2;
@@ -117,7 +130,10 @@ public class UIInGame implements ScreenController{
         text = text.replace("&lt;li&gt;","\no");
         text = text.replace("&middot;","\no");
         text = text.replace("&quot;","'");
+        /*
         cardDesc.getRenderer(TextRenderer.class).text = text;
+        */
+       qel(screen,"CardDesc").text(text);
     }
     
     public void setTurn(String player){
@@ -142,7 +158,7 @@ public class UIInGame implements ScreenController{
         }
         //this.screen.resetLayout() 
     }
-    
+    /* UI Actions =========================================================*/
     void setButtonFocus(TurnPhase.TurnPhaseType nextTurnPhase){
         switch(nextTurnPhase){
             // What phase
@@ -207,13 +223,21 @@ public class UIInGame implements ScreenController{
         btnMP2.disable();
         btnEP.disable();
     }
-    
-    
+    public void emotion(def type){
+        emotionBand.startEffect(EffectEventId.onCustom, {} as EndNotify, "moveIn");
+    }
     public void alertFlash(String alertMsg){
+        /*
         txtAlertFlash.getRenderer(TextRenderer.class).setText(alertMsg);
         //println("Set text !");
         //alert.startEffect(EffectEventId.onCustom,null,"showIt");
         txtAlertFlash.startEffect(EffectEventId.onCustom,new InGameDefaultNotify(),"endIt");
+        */
+       
+       def alert= qel(txtAlertFlash);
+       alert.text(alertMsg);
+       alert.startEffect("onCustom", new InGameDefaultNotify(), "moveIn");
+       
     }
     
     public void alertSmall(String alertMsg){
@@ -227,33 +251,6 @@ public class UIInGame implements ScreenController{
         @Override
         public void perform() {
             //txtAlertSmall.getRenderer(TextRenderer.class).setText("");
-        }
-    }
-    
-    public void drawPhase(){
-        goToPhase(DrawPhase)
-    }
-    public void mainPhase(){
-        goToPhase(MainPhase)
-    }
-    public void standByPhase(){
-        goToPhase(StandbyPhase)
-    }
-    public void battlePhase(){
-        goToPhase(BattlePhase)
-    }
-    public void mainPhase2(){
-        goToPhase(MainPhase2)
-    }
-    public void endPhase(){
-        showDialog()
-    }
-    void goToPhase(TurnPhase.TurnPhaseType aPhase){
-        if (currentTurnPhase.getNext()==aPhase){
-            gameplay.setPlayerChangePhase(aPhase)
-        } else {
-            setButtonFocus(currentTurnPhase);
-            alertSmall("You can not change Phase at this time");
         }
     }
     
@@ -281,11 +278,41 @@ public class UIInGame implements ScreenController{
     }
      */
     void showDialog() {
+        /*
         if (dialogUI!=null){
             //dialogUI.resetAllEffects();
             dialogUI.startEffect(EffectEventId.onCustom, new DialogUINotify(true), "moveIn");
         } else {
             println("dialog is null!")
+        }
+         */
+        qel(dialogUI).startEffect("onCustom", new DialogUINotify(true), "moveIn");
+    }
+    /* Phase handling */
+    public void drawPhase(){
+        goToPhase(DrawPhase)
+    }
+    public void mainPhase(){
+        goToPhase(MainPhase)
+    }
+    public void standByPhase(){
+        goToPhase(StandbyPhase)
+    }
+    public void battlePhase(){
+        goToPhase(BattlePhase)
+    }
+    public void mainPhase2(){
+        goToPhase(MainPhase2)
+    }
+    public void endPhase(){
+        showDialog()
+    }
+    void goToPhase(TurnPhase.TurnPhaseType aPhase){
+        if (currentTurnPhase.getNext()==aPhase){
+            gameplay.setPlayerChangePhase(aPhase)
+        } else {
+            setButtonFocus(currentTurnPhase);
+            alertSmall("You can not change Phase at this time");
         }
     }
 }

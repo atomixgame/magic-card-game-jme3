@@ -7,6 +7,9 @@ package magiccard.gameplay
 import sg.atom.gameplay.player.Player;
 import magiccard.CardGameStageManager;
 import magiccard.gameplay.rule.CardGameRestriction
+import magiccard.gameplay.ai.CardPlayerAI
+import magiccard.gameplay.Card.CardType
+import static magiccard.gameplay.Card.CardType.*
 
 /**
  *
@@ -57,7 +60,23 @@ public class CardPlayer extends Player{
             return null;
         }
     }
-    
+    /* For match start pos */
+    def askCoin(){
+        
+    }
+    def askHandSign(){
+        
+    }
+    /* In match */
+    def askPassTurn(){
+        
+    }
+    def askEndTurn(){
+        
+    }
+    def askChangeTurnPhase(){
+        
+    }
     public boolean askForUse(Card.CardType type,List inCardList,def info,def condition){
         CardGamePlay gamePlay = stageManager.getGamePlayManager();
         cardLib = stageManager.cardLib;
@@ -80,7 +99,21 @@ public class CardPlayer extends Player{
         boolean validAction = gamePlay.activeCard(starterCard,targetCards)
         return validAction;
     }
+    /* Advanture mode */
+    def advenAsk(){
+        
+    }
+    def advenAskQuestion(){
+        
+    }
+    def advenConversation(){
+        
+    }
+    def advenTalk(){
+        
+    }
     
+    /* Short cut for card execution */
     public boolean activeTrapCards(){
         boolean validAction;
         if (!restriction.trapCancel && magic.any{it.cardType==Card.CardType.Trap}){

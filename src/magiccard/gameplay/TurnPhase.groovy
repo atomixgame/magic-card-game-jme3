@@ -28,7 +28,7 @@ public class TurnPhase{
     TurnPhaseType type
     boolean monsterSummoned=false;    
     
-    TurnPhase(TurnPhaseType type){
+    public TurnPhase(TurnPhaseType type){
         this.type = type
     }
 

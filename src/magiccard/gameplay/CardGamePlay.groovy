@@ -12,6 +12,7 @@ import magiccard.gameplay.Card
 import magiccard.stage.ClosureSelectCondition
 import magiccard.stage.CardSelectControl
 import static magiccard.gameplay.TurnPhase.TurnPhaseType.*
+import magiccard.gameplay.ai.CardPlayerAI
 
 //import java.util.Collections
 /**
@@ -28,6 +29,8 @@ public class CardGamePlay extends GamePlayManager {
     // The real human player who controlling
     CardPlayer currentPlayer
     CardPlayer opponent
+    
+    // the UI
     def uiInGame
     def inGameScreen  
 
@@ -56,9 +59,13 @@ public class CardGamePlay extends GamePlayManager {
     }
     public void configGamePlay(){
         println "START GAMEPLAY"
-        currentPlayer = new CardPlayer(stageManager,"Yugi")
-        match = new CardMatch();
         
+        match = new CardMatch();
+
+        sampleMatch();
+    }
+    def sampleMatch(){
+        currentPlayer = new CardPlayer(stageManager,"Yugi")
         match.player1 = currentPlayer
         // opponent from the Tournament
         if (tour){
@@ -70,18 +77,17 @@ public class CardGamePlay extends GamePlayManager {
         opponent.setAI(ai);
         ai.setLevel(CardPlayerAI.AILevel.Normal);
         match.player2 = opponent
-
+        
+        // FIX : Replace with player's own cardDeck
+        // Fake the 2 org decks
+        currentPlayer.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20))
+        opponent.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20))
     }
-    
     public void startLevel(GameLevel table){
         matchStart()
     }
     public void matchStart(){
-        
         // Take out the 2 decks
-        currentPlayer.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20))
-        opponent.orgDeck.clone(stageManager.cardLib.chooseRandomCards(20))
-        
         currentPlayer.currentDeck.clone(currentPlayer.orgDeck)
         opponent.currentDeck.clone(opponent.orgDeck)
         
@@ -142,6 +148,8 @@ public class CardGamePlay extends GamePlayManager {
         stageManager.selectManager.enable = true;
     }
 
+    /* Update */   
+
     public void nextPhase(){
         switch(currentTurn.currentPhase.type){
             // What phase
@@ -178,7 +186,6 @@ public class CardGamePlay extends GamePlayManager {
         waitTimes["ToNextPhase"] = 1;
         userActions["userCanceledPhase"] = false;
     }
-    /* Update */   
     public void update(float tpf){
  
         if (waitTimes["ToNextPhase"]==0){
@@ -315,7 +322,8 @@ public class CardGamePlay extends GamePlayManager {
             
         }
     }
-    // Utils =====================================================
+    // =====================================================
+    // Utils 
     
     public def actionValid(String actionName){
         
@@ -346,12 +354,16 @@ public class CardGamePlay extends GamePlayManager {
         // make fake random deck
         return player
     }
-    
-    // Match Function
+    //=======================================================
+    // Match Function 
 
+    //=======================================================
     // Gameplay function
     public boolean checkEndGame(){
+        
         if (match.player1.score<=0||player2.score<=0){
+            // Score Rule
+            
             if (match.player2.score<=0 && player2.score<=0){
                 match.status = CardMatch.MatchStatus.Draw
             } else if (match.player1.score<=0){
@@ -360,7 +372,10 @@ public class CardGamePlay extends GamePlayManager {
                 match.status = CardMatch.MatchStatus.Win
             }
             return true;
+            
         } else if (match.player1.currentDeck.cardList.size()<=0||player2.currentDeck.cardList.size()<=0){
+            // No More Cards Rule
+            
             if (match.player1.currentDeck.cardList.size()<=0 && player2.currentDeck.cardList.size()<=0){
                 match.status = CardMatch.MatchStatus.Draw
             } else if (match.player1.currentDeck.cardList.size()<=0) {
@@ -369,10 +384,14 @@ public class CardGamePlay extends GamePlayManager {
                 match.status = CardMatch.MatchStatus.Win  
             }
             return true;
-        }
+        } else if (false){
+            // Lost card Rule
+            // Custom rules..?
+        } 
         return true;
     }
-    
+    /* Gameplay mechanics =================================================*/
+    /* Card functions */
     public CardPlayer whichPlayerCard(Card card){
         if (match.player1.orgDeck.cardList.contains(card)){
             return match.player1;
@@ -423,7 +442,7 @@ public class CardGamePlay extends GamePlayManager {
     void putDownTable(pos,up){
         
     }
-    
+    /* Card execution */
     void activeCard(Card starterCard,List targetCards){
         if (starterCard.cardType ==Card.CardType.Magic||starterCard.cardType ==Card.CardType.Trap){
             effect(starterCard,targetCards)
@@ -435,7 +454,7 @@ public class CardGamePlay extends GamePlayManager {
     public void executeScript(String script){
         
     }
-    /* Gameplay mechanics */
+
     def detach(){
         
     }
